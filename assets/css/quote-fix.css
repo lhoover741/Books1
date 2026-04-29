@@ -1,0 +1,12 @@
+/* Quote page layout fix: prevents oversized heading and spacing issues */
+.quote-page .page-main{padding-bottom:70px}
+.quote-page .page-hero{padding:44px 0 24px}
+.quote-page .page-hero h1{font-size:clamp(3.4rem,6vw,5.7rem);line-height:.96;letter-spacing:-.045em;margin-bottom:16px}
+.quote-page .page-hero p{max-width:620px;font-size:clamp(1rem,1.4vw,1.15rem)}
+.quote-page .section{padding:26px 0 72px}
+.quote-page .section-card{max-width:920px;margin:0 auto;padding:clamp(22px,3vw,34px)}
+.quote-page .form-grid{margin-top:0;gap:18px}
+.quote-page input,.quote-page select{min-height:52px}
+.quote-page textarea{min-height:145px;resize:vertical}
+.quote-page .btn.primary{min-width:180px}
+@media(max-width:640px){.quote-page .page-hero{padding:34px 0 18px}.quote-page .page-hero h1{font-size:clamp(2.8rem,14vw,4rem)}.quote-page .section{padding-top:18px}.quote-page .section-card{padding:18px}.quote-page .btn.primary{width:100%}}
