@@ -1,66 +1,468 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Glow Beauty Bar | Skincare &amp; Beauty Services
-    </title>
-    <meta name="description" content="Glow Beauty Bar — luxury facials, lash extensions, brow sculpting, and skincare tailored to you. Book your service today." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="beauty.css" />
-  </head>
-  <body>
-    <!-- Demo Banner -->
-    <div class="g-demo-bar">
-      <div class="wrap">
-        Built by
-        <a href="../index.html">        Books and Brews
-</a>
-        ·
-        <a href="../quote.html">        Get a site like this →
-</a>
-      </div>
-    </div>
-    <!-- Nav -->
-    <nav class="g-nav">
-      <div class="wrap">
-        <div class="inner">
-          <a class="g-logo" href="#top">          Glow
-          <em>          Beauty
-</em>
-          Bar
-</a>
-          <nav class="g-nav-links">
-            <a href="#services">            Services
-</a>
-            <a href="#about">            Our Approach
-</a>
-            <a href="#booking">            Book
-</a>
-          </nav>
-          <a class="g-nav-book" href="#booking">          Book a Service
-</a>
-          <button class="g-mtoggle" aria-label="Open menu" onclick="document.getElementById(&#39;gmnav&#39;).classList.toggle(&#39;open&#39;)">
-            ☰
-          </button>
-        </div>
-      </div>
-      <div class="g-mnav" id="gmnav">
-        <a href="#services">        Services
-</a>
-        <a href="#about">        Our Approach
-</a>
-        <a href="#booking">        Book
-</a>
-        <a class="g-btn g-btn-fill" href="#booking">        Book a Service
-</a>
-      </div>
-    </nav>
-    <!-- Hero -->
-    <section class="g-hero" id="top">
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5wDDOjw.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd5LDfOjw.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_s06GnM.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_iE9GnM.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_hg9GnM.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuDyYMZg.ttf) format('truetype');
+}
+/* ─────────────────────────────────────────────────────────
+   Glow Beauty Bar — beauty.css  v2 (ultra-premium)
+   Airy luxury · calm sophistication · upscale skincare
+   Books and Brews demo site  (LIGHT MODE)
+───────────────────────────────────────────────────────── */
+
+:root {
+  --accent:       #c0788e;
+  --accent-hi:    #d4a0b4;
+  --accent-mid:   rgba(192, 120, 142, 0.32);
+  --accent-light: rgba(192, 120, 142, 0.10);
+  --accent-glow:  rgba(192, 120, 142, 0.20);
+  --bg:           #faf8f5;
+  --bg-alt:       #f4f0eb;
+  --bg-raised:    #ffffff;
+  --text:         #2c1e18;
+  --muted:        #7a5a50;
+  --faint:        #b89888;
+  --line:         rgba(192, 120, 142, 0.12);
+  --line-s:       rgba(192, 120, 142, 0.24);
+  --line-m:       rgba(192, 120, 142, 0.18);
+  --radius:       18px;
+  --shadow:       0 18px 56px rgba(80, 30, 40, 0.10);
+  --c:            min(1140px, calc(100% - 44px));
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+.wrap { width: var(--c); margin: 0 auto; position: relative; z-index: 1; }
+
+/* ─── Demo Banner ─── */
+.g-demo-bar {
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+  padding: 9px 0;
+  text-align: center;
+  font-size: .74rem;
+  color: var(--faint);
+  letter-spacing: .04em;
+}
+.g-demo-bar a {
+  color: var(--accent); font-weight: 600;
+  transition: color .2s;
+}
+.g-demo-bar a:hover { color: var(--text); }
+
+/* ─── Get This Style CTA ─── */
+.g-get-style {
+  margin-top: 18px;
+  font-size: .82rem;
+  opacity: .65;
+  transition: opacity .2s;
+}
+.g-get-style:hover { opacity: 1; }
+
+.g-get-style-note {
+  display: block;
+  font-size: .76rem;
+  color: var(--faint);
+  margin-top: 8px;
+  letter-spacing: .03em;
+}
+
+/* ─── Nav ─── */
+.g-nav {
+  position: sticky; top: 0; z-index: 100;
+  padding: 18px 0;
+  background: rgba(250, 248, 245, 0.88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+.g-nav .inner { display: flex; align-items: center; justify-content: space-between; }
+.g-logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.55rem; font-weight: 600;
+  color: var(--text); letter-spacing: .04em;
+}
+.g-logo em { color: var(--accent); font-style: italic; }
+.g-nav-links { display: flex; gap: 30px; }
+.g-nav-links a {
+  font-size: .83rem; letter-spacing: .04em;
+  color: var(--muted); transition: color .2s;
+}
+.g-nav-links a:hover { color: var(--text); }
+.g-nav-book {
+  display: inline-flex; align-items: center;
+  padding: 10px 24px; border-radius: 50px;
+  font-size: .83rem; font-weight: 600;
+  border: 1px solid var(--accent); color: var(--accent);
+  background: transparent;
+  transition: background .2s, color .2s;
+}
+.g-nav-book:hover { background: var(--accent); color: #fff; }
+.g-mtoggle { display: none; }
+.g-mnav   { display: none; }
+
+/* ─── Buttons ─── */
+.g-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 15px 36px; border-radius: 50px;
+  font-weight: 600; font-size: .9rem; letter-spacing: .02em;
+  transition: transform .18s, box-shadow .2s, background .2s;
+}
+.g-btn:hover { transform: translateY(-2px); }
+.g-btn-fill {
+  background: var(--accent); color: #fff;
+  box-shadow: 0 8px 28px var(--accent-glow);
+}
+.g-btn-fill:hover { background: var(--accent-hi); box-shadow: 0 12px 36px rgba(192,120,142,.32); }
+.g-btn-line {
+  border: 1px solid var(--line-s); color: var(--accent);
+  background: transparent;
+  transition: border-color .2s, background .2s, transform .18s;
+}
+.g-btn-line:hover { background: var(--accent-light); border-color: var(--accent-mid); }
+
+/* ─── Hero — centered airy ─── */
+.g-hero {
+  text-align: center;
+  padding: 120px 0 96px; position: relative;
+  background: linear-gradient(180deg,
+    rgba(192, 120, 142, .05) 0%,
+    transparent 56%);
+}
+.g-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 22px;
+  font-size: .72rem; letter-spacing: .26em; font-weight: 600;
+  text-transform: uppercase; color: var(--accent);
+}
+.g-hero-eyebrow::before, .g-hero-eyebrow::after {
+  content: ''; display: block;
+  width: 22px; height: 1px; background: var(--accent);
+}
+.g-hero h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(3.2rem, 7vw, 6.5rem);
+  font-weight: 600; letter-spacing: -.028em;
+  line-height: .9; color: var(--text);
+  margin-bottom: 26px;
+}
+.g-hero h1 em { font-style: italic; color: var(--accent); }
+.g-hero p {
+  font-size: 1.1rem; color: var(--muted);
+  max-width: 500px; margin: 0 auto 50px;
+  line-height: 1.85;
+}
+.g-hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+/* Decorative bloom circle behind text */
+.g-hero::after {
+  content: '';
+  position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+  width: 480px; height: 480px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(192,120,142,.08) 0%, transparent 66%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── Section base ─── */
+.g-section { padding: 96px 0; }
+.g-section-alt { background: var(--bg-alt); }
+.g-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+  font-size: .72rem; letter-spacing: .26em; font-weight: 600;
+  text-transform: uppercase; color: var(--accent);
+}
+.g-label::before {
+  content: '';
+  display: block; width: 18px; height: 1px; background: var(--accent);
+}
+.g-section h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.6rem, 5vw, 4.4rem);
+  font-weight: 600; letter-spacing: -.025em;
+  line-height: .92; margin-bottom: 12px; color: var(--text);
+}
+.g-section-rule {
+  display: block; width: 40px; height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  margin: 16px 0 52px;
+}
+.g-lead {
+  font-size: 1.05rem; color: var(--muted);
+  line-height: 1.85; max-width: 520px; margin-bottom: 52px;
+}
+
+/* ─── Services — card grid ─── */
+.g-service-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.g-service {
+  padding: 38px 32px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s;
+}
+.g-service:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 60px rgba(80, 30, 40, .12);
+  border-color: var(--line-s);
+}
+.g-service-icon {
+  font-size: 1.5rem; margin-bottom: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 14px;
+  background: var(--accent-light);
+  transition: box-shadow .24s, background .24s;
+}
+.g-service:hover .g-service-icon {
+  background: rgba(192, 120, 142, .16);
+  box-shadow: 0 0 0 6px var(--accent-light);
+}
+.g-service h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.55rem; font-weight: 600; margin-bottom: 10px;
+  color: var(--text);
+}
+.g-service p {
+  font-size: .88rem; color: var(--muted); line-height: 1.75;
+  margin-bottom: 20px;
+}
+.g-service-price {
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--accent); letter-spacing: .01em;
+}
+.g-service-dur {
+  font-size: .78rem; color: var(--faint);
+  letter-spacing: .06em; margin-left: 10px;
+}
+
+/* ─── Experience / Value Items ─── */
+.g-exp { padding: 96px 0; }
+.g-exp-items { display: flex; flex-direction: column; gap: 0; }
+.g-exp-item {
+  padding: 34px 0 34px 28px;
+  border-bottom: 1px solid var(--line);
+  border-left: 2px solid transparent;
+  transition: border-left-color .25s, padding-left .25s;
+}
+.g-exp-item:first-child { border-top: 1px solid var(--line); }
+.g-exp-item:hover { border-left-color: var(--accent); }
+.g-exp-header { display: flex; align-items: baseline; gap: 18px; margin-bottom: 10px; }
+.g-exp-num {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.4rem; font-weight: 600; line-height: 1;
+  color: var(--accent); flex-shrink: 0;
+}
+.g-exp-item h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem; font-weight: 600; color: var(--text);
+}
+.g-exp-item p {
+  font-size: .9rem; color: var(--muted); line-height: 1.75;
+  padding-left: calc(2.4rem + 18px);
+}
+
+/* ─── Testimonial — full-bleed dark contrast section ─── */
+.g-testimonial {
+  background: #2c1420;
+  padding: 96px 0;
+  position: relative; overflow: hidden;
+}
+/* Soft rose glow in dark bg */
+.g-testimonial::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(192, 120, 142, .10) 0%, transparent 52%);
+  pointer-events: none;
+}
+.g-tq { max-width: 780px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+.g-tq-mark {
+  display: block; font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 6rem; line-height: .5; font-weight: 600;
+  color: rgba(192, 120, 142, .35); margin-bottom: 20px;
+  user-select: none;
+}
+.g-tq-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.9rem, 3.8vw, 3rem);
+  font-weight: 500; font-style: italic;
+  color: #f5ece8; line-height: 1.5;
+  margin-bottom: 32px;
+}
+.g-tq-divider {
+  display: block; width: 32px; height: 1px;
+  background: rgba(192, 120, 142, .4); margin: 0 auto 22px;
+}
+.g-tq-attr {
+  font-size: .8rem; letter-spacing: .14em; font-weight: 600;
+  text-transform: uppercase; color: rgba(192, 120, 142, .75);
+}
+
+/* ─── CTA — framed box ─── */
+.g-cta {
+  padding: 100px 0 110px;
+  text-align: center;
+  background: linear-gradient(180deg,
+    transparent 0%, rgba(192,120,142,.04) 50%, transparent 100%);
+}
+.g-cta-frame {
+  max-width: 660px; margin: 0 auto;
+  padding: 60px 52px;
+  border: 1px solid var(--line-s); border-radius: 24px;
+  background: var(--bg-raised);
+  box-shadow: 0 0 0 1px var(--line) inset,
+              0 28px 80px rgba(80,30,40,.07);
+}
+.g-cta-frame h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 600; letter-spacing: -.025em;
+  line-height: .95; margin: 12px 0 20px; color: var(--text);
+}
+.g-cta-frame p {
+  font-size: 1.05rem; color: var(--muted);
+  line-height: 1.8; max-width: 420px; margin: 0 auto 40px;
+}
+.g-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* ─── Footer ─── */
+.g-footer {
+  padding: 28px 0 38px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.g-footer-in {
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.g-footer-logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem; font-weight: 600; color: var(--accent);
+}
+.g-footer-sub { font-size: .8rem; color: var(--faint); margin-top: 5px; }
+.g-footer-credit { font-size: .78rem; color: var(--faint); text-align: right; }
+.g-footer-credit a { color: var(--muted); font-weight: 600; }
+.g-footer-credit a:hover { color: var(--accent); text-decoration: underline; }
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .g-service-grid { grid-template-columns: 1fr; }
+  .g-cta-frame { padding: 44px 30px; }
+}
+@media (max-width: 700px) {
+  .g-nav-links, .g-nav-book { display: none; }
+  .g-mtoggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px;
+    border: 1px solid var(--line); background: rgba(192,120,142,.06);
+    color: var(--text); border-radius: 50px; font-size: 1.2rem; cursor: pointer;
+  }
+  .g-mnav {
+    display: none; flex-direction: column;
+    padding: 12px 16px; background: rgba(250,248,245,.97);
+    border-bottom: 1px solid var(--line);
+  }
+  .g-mnav.open { display: flex; }
+  .g-mnav a {
+    padding: 13px 0; border-bottom: 1px solid var(--line);
+    font-size: .95rem; color: var(--muted);
+  }
+  .g-mnav .g-btn { margin-top: 10px; width: 100%; justify-content: center; }
+  .g-hero { padding: 80px 0 72px; }
+  .g-hero-btns { flex-direction: column; align-items: center; }
+  .g-hero-btns a { width: 100%; max-width: 300px; }
+  .g-get-style { width: 100%; max-width: 300px; text-align: center; margin-top: 12px; }
+  .g-section { padding: 64px 0; }
+  .g-exp { padding: 64px 0; }
+  .g-testimonial { padding: 64px 0; }
+  .g-cta { padding: 64px 0 72px; }
+  .g-exp-item p { padding-left: 0; }
+  .g-cta-frame { padding: 36px 24px; }
+  .g-cta-btns { flex-direction: column; align-items: center; }
+  .g-cta-btns a { width: 100%; max-width: 300px; }
+  .g-footer-in { flex-direction: column; text-align: center; }
+  .g-footer-credit { text-align: center; }
+}
+/* Start Project Wallace extracted inline styles */
+div.wrap { position:relative;z-index:1; }
+div { margin-top:22px; padding-top:20px; border-top:1px solid var(--line); display:grid; justify-items:center; gap:8px; }
+a.g-btn.g-btn-fill { width:100%; max-width:300px; }
+span { font-size:.73rem; opacity:.6; }
+/** End Project Wallace extracted inline styles */    <section class="g-hero" id="top">
       <div class="wrap" style="position:relative;z-index:1;">
         <span class="g-hero-eyebrow">        Luxury Beauty Studio
 </span>
