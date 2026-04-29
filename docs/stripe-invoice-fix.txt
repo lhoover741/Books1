@@ -1,0 +1,12 @@
+Stripe invoice fix needed in _worker.js:
+
+Find this Stripe invoice create call:
+
+const inv=await stripe(env,'invoices',{customer:customer.id,collection_method:'send_invoice',days_until_due:'7',auto_advance:'false','metadata[lead_id]':String(id),'metadata[invoice_number]':name});
+
+Replace it with:
+
+const inv=await stripe(env,'invoices',{customer:customer.id,collection_method:'send_invoice',days_until_due:'7',auto_advance:'false',pending_invoice_items_behavior:'include','metadata[lead_id]':String(id),'metadata[invoice_number]':name});
+
+Why:
+Stripe is creating the invoice item correctly, but the invoice is finalizing with no line items. pending_invoice_items_behavior:'include' tells Stripe to pull the pending invoice item into the invoice before finalizing.
