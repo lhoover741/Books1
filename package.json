@@ -1,0 +1,12 @@
+{
+  "name": "books-and-brews-merged-site-crm",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev . --compatibility-date=2026-04-29",
+    "deploy": "wrangler pages deploy . --project-name=books-and-brews"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}

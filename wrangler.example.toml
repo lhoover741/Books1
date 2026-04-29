@@ -1,0 +1,11 @@
+name = "books-and-brews"
+compatibility_date = "2026-04-29"
+
+# For Cloudflare Pages, add this D1 binding in the dashboard:
+# Binding name: LEADS_DB
+# Database: your Books and Brews D1 database
+
+# Add these environment variables/secrets in Cloudflare Pages when ready:
+# RESEND_API_KEY
+# LEAD_NOTIFY_TO = "your@email.com"
+# LEAD_FROM_EMAIL = "Books and Brews <leads@booksnbrew.net>"
