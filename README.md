@@ -1,10 +1,10 @@
-# Books and Brews - Merged Business Site + CRM
+# Books and Brews — Public Website Redesign + CRM Backend
 
-This package merges the polished public Books and Brews marketing website with a lead-management backend and CRM structure.
+This repository contains the Books and Brews public website redesigned to match the layout, spacing, and premium feel of GovDirect while preserving the existing CRM backend, Cloudflare Pages Functions, and D1 lead storage.
 
 ## What is included
 
-### Public website
+### Public-facing website
 - `index.html`
 - `about.html`
 - `services.html`
@@ -14,43 +14,39 @@ This package merges the polished public Books and Brews marketing website with a
 - `assets/css/styles.css`
 - `assets/js/main.js`
 
-### Working lead capture backend for Cloudflare Pages
+### Cloudflare Pages backend routes
 - `functions/api/contact.js`
 - `functions/api/leads/index.js`
 - `functions/api/leads/[id].js`
 - `functions/api/notes/add.js`
 - `schema.sql`
 
-### Lightweight web CRM dashboard
+### Admin CRM
 - `admin/index.html`
 - `admin/assets/admin.css`
 - `admin/assets/admin.js`
 
-### Original CRM source preserved
+### Original source preserved
 - `crm-source/`
 
-Your uploaded CRM was preserved inside `crm-source/` so nothing is lost. The public website now submits quote/contact leads into the Cloudflare backend when D1 is connected.
+## Deployment instructions
 
-## Cloudflare Pages setup
-
-Build settings:
-- Framework preset: None
+### Cloudflare Pages settings
+- Framework preset: `None`
 - Build command: leave blank
 - Output directory: `/`
 
-## D1 setup
-
-Create a D1 database, then run `schema.sql`.
-
-Bind the database to your Pages project using this exact binding name:
+### D1 setup
+1. Create a D1 database in Cloudflare.
+2. Run the schema in `schema.sql`.
+3. Add a Pages binding with the name:
 
 ```txt
 LEADS_DB
 ```
 
-## Optional Resend email setup
-
-Add these Cloudflare Pages environment variables/secrets:
+### Environment variables
+For lead notification email support, add these secrets:
 
 ```txt
 RESEND_API_KEY
@@ -58,22 +54,21 @@ LEAD_NOTIFY_TO
 LEAD_FROM_EMAIL
 ```
 
-Example:
+Recommended values:
 
 ```txt
-LEAD_NOTIFY_TO=michael@example.com
-LEAD_FROM_EMAIL=Books and Brews <leads@booksnbrew.net>
+LEAD_NOTIFY_TO=you@example.com
+LEAD_FROM_EMAIL="Books and Brews <leads@booksnbrew.net>"
 ```
 
-## How the merged flow works
+## Admin route
+- Public admin dashboard is available at `/admin/index.html`
 
-1. Visitor lands on the public site.
-2. Visitor submits quote/contact form.
-3. `/api/contact` receives the lead.
-4. Lead is saved into D1.
-5. Optional Resend notification is sent.
-6. Lead appears inside `/admin/index.html`.
+## Form route
+- Quote and contact submissions POST to `/api/contact`
+- The route saves leads into D1 and sends optional email notifications
 
-## Important note
-
-The original CRM/mobile app from your uploaded ZIP is still included in `crm-source/`. This merged package adds a Cloudflare-ready public website + lightweight admin CRM so you can deploy fast while keeping the bigger CRM system available for future expansion.
+## Notes
+- The public site has been redesigned to match the GovDirect-style homepage layout, section rhythm, button style, and footer structure.
+- Backend and CRM files were preserved and not removed.
+- The redesigned site keeps Books and Brews branding, website development business content, and the existing quote/contact flow.
