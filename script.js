@@ -20,6 +20,8 @@ document.querySelectorAll('form[action="/api/contact"]').forEach(form=>{form.add
   }
   if (!footer) return;
 
+  const year = new Date().getFullYear();
+
   footer.className = 'footer container footer-upgraded';
   footer.innerHTML = `
     <div>
@@ -42,6 +44,13 @@ document.querySelectorAll('form[action="/api/contact"]').forEach(form=>{form.add
     <div>
       <h4>Start</h4>
       <a class="button button-primary" href="/quote.html">Start Your Website</a>
+    </div>
+    <div style="grid-column:1/-1;text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--line);">
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:6px;">© ${year} Books and Brews. All rights reserved.</p>
+      <p style="font-size:.85rem;">
+        <a href="/privacy.html" style="color:var(--muted);margin:0 8px;">Privacy Policy</a> |
+        <a href="/terms.html" style="color:var(--muted);margin:0 8px;">Terms of Service</a>
+      </p>
     </div>
   `;
 })();
