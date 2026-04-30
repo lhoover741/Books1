@@ -21,25 +21,17 @@
   </div>
 
   <section class="portal-hero">
-    <h1 id="projectTitle">Website Project</h1>
+    <div class="brand-mark">
+      <div class="brand-icon">B&B</div>
+      <div><span class="brand-name">Books and Brews</span><span class="brand-tag">Smart Websites. Smooth Experience.</span></div>
+    </div>
+    <h1 id="projectTitle"></h1>
     <p id="details"></p>
-    <span class="portal-pill" id="status">Status</span>
+    <span class="portal-pill" id="status"></span>
   </section>
 
   <div id="portal" class="portal-grid" style="display:none">
     <div>
-      <div class="portal-stat-grid">
-        <div class="portal-stat"><span>Client</span><strong id="clientName"></strong></div>
-        <div class="portal-stat"><span>Email</span><strong id="clientEmail"></strong></div>
-        <div class="portal-stat"><span>Business</span><strong id="business"></strong></div>
-        <div class="portal-stat"><span>Status</span><strong id="status2"></strong></div>
-      </div>
-
-      <div class="portal-card">
-        <h2>Project Progress</h2>
-        <div class="progress-track"><div id="progressBar" class="progress-fill"></div></div>
-      </div>
-
       <div class="portal-card">
         <h2>Invoices</h2>
         <div id="invoices" class="portal-list"></div>
@@ -49,56 +41,39 @@
         <h2>Files</h2>
         <div id="files" class="portal-list"></div>
       </div>
+
+      <div class="portal-card">
+        <h2>Send a Message</h2>
+        <textarea id="replyMessage" placeholder="Ask a question..."></textarea>
+        <button class="portal-btn" onclick="sendReply()">Send</button>
+        <p id="replyStatus"></p>
+      </div>
     </div>
 
     <div>
-      <div class="portal-card">
-        <h2>Activity</h2>
-        <div id="timeline" class="timeline"></div>
-      </div>
-
       <div class="portal-card">
         <h2>Messages</h2>
         <div id="messages" class="portal-list"></div>
       </div>
     </div>
   </div>
-
-  <div id="error" class="portal-card portal-error"></div>
 </div>
 
 <script>
-function esc(v){return String(v??'').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
-function logout(){localStorage.removeItem('bb_lead');location.href='/client/login.html'}
 const lead=new URLSearchParams(location.search).get('lead')||localStorage.getItem('bb_lead');
+function esc(v){return String(v??'')}
+function logout(){localStorage.removeItem('bb_lead');location.href='/client/login.html'}
+async function sendReply(){const msg=document.getElementById('replyMessage').value;if(!msg)return;replyStatus.textContent='Sending...';await fetch('/api/leads/'+lead+'/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject:'Client Message',message:msg})});replyStatus.textContent='Sent';}
 (async()=>{
-try{
- if(!lead) throw new Error('Session expired. Please login again.');
- const res=await fetch('/api/leads/'+lead);
- const data=await res.json();
- if(!data.ok) throw new Error(data.error);
- const l=data.lead;
- intro.textContent='Welcome back, '+l.name;
- clientName.textContent=l.name;
- clientEmail.textContent=l.email;
- business.textContent=l.business_name||'-';
- projectTitle.textContent=data.project?.title||l.project_type||'Project';
- details.textContent=l.project_details||l.message||'';
- status.textContent=l.status;
- status2.textContent=l.status;
- progressBar.style.width=(data.project?.progress||0)+'%';
-
- invoices.innerHTML=(data.invoices||[]).map(i=>'<div class="portal-item"><strong>'+esc(i.invoice_number)+'</strong><br>$'+esc(i.amount)+' · '+esc(i.status)+(i.payment_link?'<br><a class="portal-pay" href="'+i.payment_link+'" target="_blank">Pay Now</a>':'')+'</div>').join('')||'<div class="portal-item">No invoices yet</div>';
- files.innerHTML=(data.files||[]).map(f=>'<div class="portal-item"><a href="'+f.file_url+'" target="_blank">'+esc(f.file_name)+'</a></div>').join('')||'<div class="portal-item">No files yet</div>';
- messages.innerHTML=(data.messages||[]).map(m=>'<div class="portal-item"><strong>'+esc(m.subject)+'</strong><br>'+esc(m.message)+'</div>').join('')||'<div class="portal-item">No messages yet</div>';
-
- const timelineItems=[...(data.notes||[]).map(n=>({t:n.created_at,l:n.note})),...(data.invoices||[]).map(i=>({t:i.created_at,l:'Invoice '+i.invoice_number})))]
- .sort((a,b)=>new Date(b.t)-new Date(a.t))
- .slice(0,6);
- timeline.innerHTML=timelineItems.map(i=>'<div class="timeline-item"><strong>'+new Date(i.t).toLocaleString()+'</strong>'+esc(i.l)+'</div>').join('');
-
- portal.style.display='grid';
-}catch(e){error.classList.add('open');error.innerHTML='<h2>Error</h2><p>'+esc(e.message)+'</p>'}
+const res=await fetch('/api/leads/'+lead);
+const data=await res.json();
+const l=data.lead;
+projectTitle.textContent=l.project_type;
+details.textContent=l.project_details;
+status.textContent=l.status;
+invoices.innerHTML=(data.invoices||[]).map(i=>'<div class="portal-item">'+i.invoice_number+'</div>').join('');
+messages.innerHTML=(data.messages||[]).map(m=>'<div class="portal-item">'+m.message+'</div>').join('');
+portal.style.display='grid';
 })();
 </script>
 </body>
