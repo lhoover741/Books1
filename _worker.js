@@ -35,4 +35,41 @@ async function createClientAccess(request,env,id){const d=db(env);if(!d)return j
 async function clientLogin(request,env){const d=db(env);if(!d)return json({ok:false,error:'Database not connected. Bind D1 as DB.'},500);await ensure(d);const b=await body(request);const email=clean(b.email).toLowerCase(),code=clean(b.code||b.password);if(!email||!code)return json({ok:false,error:'Email and access code are required.'},400);const row=await d.prepare("SELECT * FROM client_access WHERE lower(email)=? AND code=? AND status='active' ORDER BY id DESC LIMIT 1").bind(email,code).first();if(!row)return json({ok:false,error:'Invalid email or access code.'},401);await d.prepare('UPDATE client_access SET last_login_at=? WHERE id=?').bind(new Date().toISOString(),row.id).run();return json({ok:true,token:row.token,lead_id:row.lead_id})}
 async function stripeLink(request,env,id){const d=db(env);if(!d)return json({ok:false,error:'Database not connected. Bind D1 as DB.'},500);await ensure(d);const b=await body(request),amt=cents(b.amount),name=clean(b.invoice_number||'Books and Brews Website Payment');if(!amt)return json({ok:false,error:'Amount is required.'},400);const link=await stripe(env,'payment_links',{'line_items[0][quantity]':'1','line_items[0][price_data][currency]':'usd','line_items[0][price_data][unit_amount]':String(amt),'line_items[0][price_data][product_data][name]':name,'invoice_creation[enabled]':'true','metadata[lead_id]':String(id),'metadata[invoice_number]':name,'payment_intent_data[metadata][lead_id]':String(id),'payment_intent_data[metadata][invoice_number]':name});await saveInvoice(d,id,{...b,invoice_number:name,amount:b.amount,payment_link:link.url},'Stripe Link',link.url);return json({ok:true,url:link.url,id:link.id})}
 async function stripeInvoice(request,env,id){const d=db(env);if(!d)return json({ok:false,error:'Database not connected. Bind D1 as DB.'},500);await ensure(d);const lead=await d.prepare('SELECT * FROM leads WHERE id=?').bind(id).first();if(!lead)return json({ok:false,error:'Lead not found.'},404);const b=await body(request),amt=cents(b.amount),name=clean(b.invoice_number||'Books and Brews Invoice');if(!amt)return json({ok:false,error:'Amount is required.'},400);const customerParams={email:lead.email,name:lead.name};if(lead.phone)customerParams.phone=lead.phone;const customer=await stripe(env,'customers',customerParams);await stripe(env,'invoiceitems',{customer:customer.id,amount:String(amt),currency:'usd',description:name});const inv=await stripe(env,'invoices',{customer:customer.id,collection_method:'send_invoice',days_until_due:'7',auto_advance:'false',pending_invoice_items_behavior:'include','metadata[lead_id]':String(id),'metadata[invoice_number]':name});const fin=await stripe(env,'invoices/'+inv.id+'/finalize',{});const invoiceUrl=fin.hosted_invoice_url||fin.invoice_pdf||'';await saveInvoice(d,id,{...b,invoice_number:name,amount:b.amount,payment_link:invoiceUrl},'Stripe Invoice',invoiceUrl);return json({ok:true,url:invoiceUrl,id:fin.id})}
-export default{async fetch(request,env){const url=new URL(request.url),path=url.pathname.replace(/\/$/,'')||'/';try{if(path==='/api/contact'&&request.method==='POST')return await saveLead(request,env);if(path==='/api/leads'&&request.method==='GET')return await listLeads(env);if(path==='/api/client/login'&&request.method==='POST')return await clientLogin(request,env);if(path==='/api/followups/run'&&(request.method==='GET'||request.method==='POST'))return await runFollowups(request,env);let m=path.match(/^\/api\/leads\/(\d+)$/);if(m&&request.method==='GET')return await leadBundle(env,m[1]);if(m&&request.method==='PATCH')return await patchLead(request,env,m[1]);m=path.match(/^\/api\/leads\/(\d+)\/client-access$/);if(m&&request.method==='POST')return await createClientAccess(request,env,m[1]);m=path.match(/^\/api\/leads\/(\d+)\/(note|project|invoice|reminder|booking|message|file)$/);if(m&&request.method==='POST')return await action(request,env,m[1],m[2]);m=path.match(/^\/api\/leads\/(\d+)\/stripe\/(payment-link|invoice)$/);if(m&&request.method==='POST')return m[2]==='payment-link'?await stripeLink(request,env,m[1]):await stripeInvoice(request,env,m[1]);if(path.startsWith('/api/'))return json({ok:false,error:'API route not found.'},404);return env.ASSETS.fetch(request)}catch(e){return json({ok:false,error:String(e)},500)}}};
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url), path = url.pathname.replace(/\/$/, '') || '/';
+
+    try {
+      if (path === '/api/contact' && request.method === 'POST') return await saveLead(request, env);
+      if (path === '/api/leads' && request.method === 'GET') return await listLeads(env);
+      if (path === '/api/client/login' && request.method === 'POST') return await clientLogin(request, env);
+      if (path === '/api/followups/run' && (request.method === 'GET' || request.method === 'POST')) return await runFollowups(request, env);
+
+      let m = path.match(/^\/api\/leads\/(\d+)$/);
+      if (m && request.method === 'GET') return await leadBundle(env, m[1]);
+      if (m && request.method === 'PATCH') return await patchLead(request, env, m[1]);
+
+      m = path.match(/^\/api\/leads\/(\d+)\/client-access$/);
+      if (m && request.method === 'POST') return await createClientAccess(request, env, m[1]);
+
+      m = path.match(/^\/api\/leads\/(\d+)\/(note|project|invoice|reminder|booking|message|file)$/);
+      if (m && request.method === 'POST') return await action(request, env, m[1], m[2]);
+
+      m = path.match(/^\/api\/leads\/(\d+)\/stripe\/(payment-link|invoice)$/);
+      if (m && request.method === 'POST') return m[2] === 'payment-link'
+        ? await stripeLink(request, env, m[1])
+        : await stripeInvoice(request, env, m[1]);
+
+      if (path.startsWith('/api/')) return json({ ok: false, error: 'API route not found.' }, 404);
+      return env.ASSETS.fetch(request);
+    } catch (e) {
+      return json({ ok: false, error: String(e) }, 500);
+    }
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(
+      runFollowups(new Request('https://booksnbrew.govdirect.org/api/followups/run'), env)
+    );
+  }
+};
