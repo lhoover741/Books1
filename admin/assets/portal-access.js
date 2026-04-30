@@ -1,24 +1,46 @@
+function bbGetManagedLeadId(){
+  var invoice=document.getElementById('invoiceNumber');
+  if(invoice&&invoice.value){
+    var n=Number(String(invoice.value).replace('INV-',''));
+    if(n>=1000)return n-1000;
+  }
+  var modal=document.querySelector('.lead-manage-modal');
+  if(modal){
+    var text=modal.textContent||'';
+    var match=text.match(/Lead ID\s*#?\s*(\d+)/i)||text.match(/INV-(\d+)/i);
+    if(match){
+      var val=Number(match[1]);
+      return val>=1000?val-1000:val;
+    }
+  }
+  return null;
+}
+
 function bbPortalAccessAttach(){
   document.querySelectorAll('.manage-btn').forEach(function(button){
     if(button.dataset.portalReady==='1') return;
     if((button.textContent||'').trim() !== 'Create Client Portal Access') return;
     button.dataset.portalReady='1';
-    button.addEventListener('click', async function(){
-      var modal = button.closest('.lead-manage-modal');
-      var email = modal && modal.querySelector('a[href^="mailto:"]') ? modal.querySelector('a[href^="mailto:"]').getAttribute('href').replace('mailto:','') : '';
-      var nameEl = modal ? modal.querySelector('.manage-card h3') : null;
-      var name = nameEl ? nameEl.textContent.trim() : 'there';
-      var subject = 'Your Books and Brews Client Portal Access';
-      var body = 'Hi '+name+',%0D%0A%0D%0AYour Books and Brews client portal is ready.%0D%0A%0D%0ALogin page: '+location.origin+'/client/login.html%0D%0A%0D%0AUse the email address you submitted with your quote request. I will send your temporary password separately.%0D%0A%0D%0AThanks,%0D%0ABooks and Brews';
-      if(email){ window.location.href='mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+body; }
-      else { alert('Client email was not found on this lead.'); }
+    button.addEventListener('click', async function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      var leadId=bbGetManagedLeadId();
+      if(!leadId){alert('Could not detect lead ID. Close and reopen Manage, then try again.');return;}
+      var original=button.textContent;
+      button.disabled=true;
+      button.textContent='Sending portal access...';
       try{
-        var invoice=document.getElementById('invoiceNumber');
-        var leadId=invoice?Number(String(invoice.value).replace('INV-',''))-1000:null;
-        if(leadId){
-          await fetch('/api/leads/'+leadId+'/note',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({note:'Client portal access email prepared.'})});
-        }
-      }catch(e){}
+        var res=await fetch('/api/leads/'+leadId+'/client-access',{method:'POST'});
+        var data=await res.json();
+        if(!res.ok||!data.ok)throw new Error(data.error||'Unable to send portal access.');
+        button.textContent='Portal access sent';
+        alert('Portal access sent through Resend. The client will receive the portal link and access code in separate emails.');
+      }catch(err){
+        button.textContent=original;
+        alert(err.message||'Unable to send portal access.');
+      }finally{
+        setTimeout(function(){button.disabled=false;button.textContent=original;},2200);
+      }
     });
   });
 }
