@@ -1,25 +1,55 @@
 const lead=new URLSearchParams(location.search).get('lead')||localStorage.getItem('bb_lead');
+const unreadKey='bb_seen_messages_'+lead;
+let initialLoad=true;
+let isSending=false;
 function esc(v){return String(v??'').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
 function money(v){return '$'+Number(v||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
 function safeDate(v){try{return v?new Date(v).toLocaleString():''}catch(e){return ''}}
 function logout(){localStorage.removeItem('bb_lead');localStorage.removeItem('bb_token');location.href='/client/login.html'}
+function getSeenCount(){return Number(localStorage.getItem(unreadKey)||0)}
+function setSeenCount(n){localStorage.setItem(unreadKey,String(n))}
+function updateUnread(total){
+ const badge=document.getElementById('unreadBadge');
+ if(!badge)return;
+ const seen=getSeenCount();
+ const unread=Math.max(0,total-seen);
+ if(unread>0){badge.textContent=unread+' new';badge.style.display='inline-flex'}
+ else{badge.style.display='none'}
+}
+function markMessagesSeen(){
+ const total=Number(messages?.dataset?.count||0);
+ setSeenCount(total);
+ updateUnread(total);
+}
 async function sendReply(){
+ if(isSending)return;
  const box=document.getElementById('replyMessage');
+ const btn=document.getElementById('sendMessageBtn');
  const msg=box.value.trim();
  if(!msg)return;
- replyStatus.textContent='Sending...';
+ isSending=true;
+ replyStatus.textContent='Sending message...';
+ if(btn){btn.disabled=true;btn.textContent='Sending...'}
  try{
   const res=await fetch('/api/leads/'+lead+'/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject:'Client Message',message:msg,direction:'incoming'})});
   if(!res.ok)throw new Error('Message failed');
   replyStatus.textContent='Message sent ✔';
-  messages.innerHTML='<div class="portal-item"><strong>You</strong><br>'+esc(msg)+'</div>'+messages.innerHTML;
+  messages.innerHTML='<div class="portal-item message-incoming"><strong>You</strong><br>'+esc(msg)+'</div>'+messages.innerHTML;
   box.value='';
+  setTimeout(loadPortal,600);
  }catch(e){replyStatus.textContent='Failed to send. Please try again.'}
+ finally{isSending=false;if(btn){btn.disabled=false;btn.textContent='Send Message'}}
+}
+function renderStages(project){
+ const stages=['Planning','Design','Development','Review','Launch'];
+ const current=project.stage||'Planning';
+ const idx=Math.max(0,stages.indexOf(current));
+ stageWrap.innerHTML='<h2>Project Stages</h2><div class="stage-steps">'+stages.map((s,i)=>'<div class="stage-step '+(i<idx?'done':i===idx?'active':'')+'"><span>'+(i+1)+'</span><strong>'+s+'</strong></div>').join('')+'</div>';
 }
 async function loadPortal(){
 try{
  if(!lead)throw new Error('Session expired. Please login again.');
- const res=await fetch('/api/leads/'+lead);
+ const res=await fetch('/api/leads/'+lead,{cache:'no-store'});
  const data=await res.json();
  if(!res.ok||!data.ok)throw new Error(data.error||'Unable to load portal.');
  const l=data.lead||{};
@@ -36,13 +66,18 @@ try{
  nextStep.textContent=project.next_milestone||'We are reviewing your project details and preparing the next step.';
  progressBar.style.width=Math.min(100,Math.max(0,progress))+'%';
  progressText.textContent=progress+'% complete';
+ renderStages(project);
  invoices.innerHTML=(data.invoices||[]).length?(data.invoices||[]).map(i=>'<div class="portal-item"><strong>'+esc(i.invoice_number)+'</strong><br>'+money(i.amount)+' · '+esc(i.status||'Draft')+(i.payment_link?'<br><a class="portal-pay" href="'+esc(i.payment_link)+'" target="_blank">Pay / View Invoice</a>':'')+'</div>').join(''):'<div class="portal-item">No invoices yet.<br><span class="microcopy">Invoices and payment links will appear here.</span></div>';
  files.innerHTML=(data.files||[]).length?(data.files||[]).map(f=>'<div class="portal-item"><a href="'+esc(f.file_url)+'" target="_blank">'+esc(f.file_name||'Open file')+'</a></div>').join(''):'<div class="portal-item">No files shared yet.<br><span class="microcopy">Contracts, previews, and deliverables will appear here.</span></div>';
- messages.innerHTML=(data.messages||[]).length?(data.messages||[]).map(m=>'<div class="portal-item"><strong>'+esc(m.subject||'Message')+'</strong><br>'+esc(m.message||'')+'</div>').join(''):'<div class="portal-item">No messages yet.<br><span class="microcopy">Start a conversation using the message box.</span></div>';
- const timelineItems=[...(data.notes||[]).map(n=>({t:n.created_at,l:n.note})),...(data.invoices||[]).map(i=>({t:i.created_at,l:'Invoice '+i.invoice_number+' created'})),...(data.files||[]).map(f=>({t:f.created_at,l:'File shared: '+f.file_name}))].sort((a,b)=>new Date(b.t)-new Date(a.t)).slice(0,8);
+ const msgList=data.messages||[];
+ messages.dataset.count=msgList.length;
+ messages.innerHTML=msgList.length?msgList.map(m=>'<div class="portal-item '+(m.direction==='incoming'?'message-incoming':'message-outgoing')+'"><strong>'+(m.direction==='incoming'?'You':'Books and Brews')+'</strong><br>'+esc(m.message||'')+'</div>').join(''):'<div class="portal-item">No messages yet.<br><span class="microcopy">Start a conversation using the message box.</span></div>';
+ if(initialLoad){setSeenCount(msgList.length);initialLoad=false}else{updateUnread(msgList.length)}
+ const timelineItems=[...(data.notes||[]).map(n=>({t:n.created_at,l:n.note})),...(data.invoices||[]).map(i=>({t:i.created_at,l:'Invoice '+i.invoice_number+' created'})),...(data.files||[]).map(f=>({t:f.created_at,l:'File shared: '+f.file_name})),...msgList.map(m=>({t:m.created_at,l:(m.direction==='incoming'?'You sent: ':'Books and Brews replied: ')+(m.message||'')}))].sort((a,b)=>new Date(b.t)-new Date(a.t)).slice(0,8);
  timeline.innerHTML=timelineItems.length?timelineItems.map(i=>'<div class="timeline-item"><strong>'+safeDate(i.t)+'</strong>'+esc(i.l)+'</div>').join(''):'<div class="portal-item">No activity yet.<br><span class="microcopy">Project updates will appear here.</span></div>';
  portal.style.display='block';
 }catch(e){error.classList.add('open');error.innerHTML='<h2>Unable to load portal</h2><p>'+esc(e.message)+'</p><a class="portal-pay" href="/client/login.html">Go to Login</a>'}
 }
+document.addEventListener('click',e=>{if(e.target.closest('#messages'))markMessagesSeen()});
 loadPortal();
 setInterval(loadPortal,10000);
