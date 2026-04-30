@@ -1,1 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Client Portal | Books and Brews</title><link rel="stylesheet" href="/assets/css/styles.css"></head><body><div class="site-shell"><section class="page-hero"><div class="container"><div class="section-card"><span class="eyebrow">Client Portal</span><h1 class="page-title">Project Dashboard</h1><p class="page-copy">Your project details, status, notes, and reminders will appear here after portal authentication is fully connected.</p><a href="/" class="btn secondary">Back Home</a></div></div></section></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal | Books and Brews</title>
+<link rel="stylesheet" href="/assets/css/styles.css">
+<style>
+body{background:#0b0b0b;color:#f5ede3;font-family:Arial,sans-serif;margin:0}.wrap{max-width:1100px;margin:auto;padding:36px 18px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.kicker{color:#97AFB0;font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}h1{font-size:clamp(2.2rem,7vw,5rem);line-height:.92;margin:8px 0 12px;letter-spacing:-.06em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:linear-gradient(180deg,#151515,#101010);border:1px solid rgba(200,169,126,.22);border-radius:24px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.25)}.muted{color:#cfc6bc;line-height:1.6}.pill{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(151,175,176,.1);border:1px solid rgba(151,175,176,.24);color:#97AFB0;font-weight:900}.list{display:grid;gap:12px}.item{padding:14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(151,175,176,.14)}a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:12px;background:#c8a97e;color:#0b0b0b;text-decoration:none;font-weight:900}@media(max-width:800px){.grid{grid-template-columns:1fr}.top{display:block}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div><p class="kicker">Client Portal</p><h1>Project Dashboard</h1><p class="muted" id="intro">Loading your project...</p></div><a class="btn" href="/">Back Home</a></div>
+  <div id="error" class="card" style="display:none"></div>
+  <div id="portal" class="grid" style="display:none">
+    <section class="card"><p class="kicker">Project</p><h2 id="projectTitle">Website Project</h2><p class="muted" id="details"></p><p><span class="pill" id="status">Status</span></p></section>
+    <aside class="card"><p class="kicker">Client</p><h2 id="clientName"></h2><p class="muted" id="clientEmail"></p><p class="muted" id="business"></p></aside>
+    <section class="card"><p class="kicker">Invoices</p><div class="list" id="invoices"></div></section>
+    <section class="card"><p class="kicker">Files</p><div class="list" id="files"></div></section>
+    <section class="card"><p class="kicker">Notes</p><div class="list" id="notes"></div></section>
+    <section class="card"><p class="kicker">Messages</p><div class="list" id="messages"></div></section>
+  </div>
+</div>
+<script>
+const q=new URLSearchParams(location.search);const lead=q.get('lead')||localStorage.getItem('bb_lead');
+function esc(v){return String(v??'').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
+function item(v){return '<div class="item">'+v+'</div>'}
+(async()=>{try{if(!lead)throw new Error('No portal access found. Please use the access link sent to your email.');const res=await fetch('/api/leads/'+lead);const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Unable to load portal.');const l=data.lead;intro.textContent='Welcome back, '+l.name+'. Here is your current project snapshot.';clientName.textContent=l.name;clientEmail.textContent=l.email;business.textContent=l.business_name||'Business name not provided';projectTitle.textContent=(data.project&&data.project.title)||l.project_type||'Website Project';details.textContent=l.project_details||l.message||'Project details will appear here as they are added.';status.textContent=l.status||'New';invoices.innerHTML=(data.invoices||[]).length?data.invoices.map(i=>item('<strong>'+esc(i.invoice_number)+'</strong><br>$'+esc(i.amount)+' · '+esc(i.status)+(i.payment_link?' · <a href="'+esc(i.payment_link)+'" target="_blank">Pay/Open</a>':''))).join(''):item('No invoices yet.');files.innerHTML=(data.files||[]).length?data.files.map(f=>item('<a href="'+esc(f.file_url)+'" target="_blank">'+esc(f.file_name)+'</a>')).join(''):item('No files shared yet.');notes.innerHTML=(data.notes||[]).length?data.notes.slice(0,5).map(n=>item(esc(n.note))).join(''):item('No client-facing notes yet.');messages.innerHTML=(data.messages||[]).length?data.messages.slice(0,5).map(m=>item('<strong>'+esc(m.subject)+'</strong><br>'+esc(m.message))).join(''):item('No messages yet.');portal.style.display='grid'}catch(e){error.style.display='block';error.innerHTML='<h2>Unable to load portal</h2><p class="muted">'+esc(e.message)+'</p><a class="btn" href="/client/login.html">Go to Login</a>'}})();
+</script>
+</body>
+</html>
