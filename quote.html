@@ -6,6 +6,7 @@
 <title>Request a Quote | Books and Brews</title>
 <meta name="description" content="Start your website project with Books and Brews. Simple process, clear pricing, and fast turnaround." />
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="consistency.css">
 </head>
 <body>
 <div class="site-shell inner-page">
@@ -17,6 +18,7 @@
 <a href="services.html">Services</a>
 <a href="portfolio.html">Portfolio</a>
 <a href="contact.html">Contact</a>
+<a href="client/login.html">Client Portal</a>
 </nav>
 <a class="button button-primary" href="quote.html">Get a Quote</a>
 </header>
@@ -74,7 +76,16 @@
 </select>
 
 <label>Tell us about your project</label>
-<textarea name="projectDetails" placeholder="What does your business do? What do you want your website to help with?" required></textarea>
+<textarea name="projectDetails" required></textarea>
+
+<div style="margin-top:14px;">
+<label style="display:flex; gap:10px; align-items:flex-start;">
+<input type="checkbox" required>
+<span style="font-size:.9rem; color:var(--muted);">
+I agree to the <a href="/client-agreement.html" style="color:#C89B6D;">Client Agreement</a> and understand project terms.
+</span>
+</label>
+</div>
 
 <button class="button button-primary" type="submit" style="margin-top:18px;">Submit Request</button>
 
@@ -82,18 +93,10 @@
 </div>
 </section>
 
-<section class="cta-band">
-<div>
-<h2>Ready to get started?</h2>
-<p>Most projects start within a few days. Limited spots available.</p>
-</div>
-<div class="cta-actions">
-<a class="button button-primary" href="#">Submit Your Request</a>
-</div>
-</section>
-
 </main>
 
+<footer class="footer container"></footer>
 </div>
+<script src="script.js"></script>
 </body>
 </html>
