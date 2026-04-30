@@ -1,135 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Request a Quote | Books and Brews</title>
-  <meta name="description" content="Start your Books and Brews website project. Custom websites starting at $125 with clear packages, deposits, and a smooth process.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="assets/css/quote-fix.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request a Quote | Books and Brews</title>
+<meta name="description" content="Start your website project with Books and Brews. Simple process, clear pricing, and fast turnaround." />
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="site-shell inner-page quote-page">
-    <header class="topbar container">
-      <a class="brand" href="index.html"><span class="brand-mark">☕</span><span class="brand-text"><strong>BOOKS AND</strong><em>BREWS</em></span></a>
-      <nav class="desktop-nav">
-        <a href="index.html">Home</a>
-        <a href="services.html">Services</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="contact.html">Contact</a>
-        <a href="client/login.html">Client Portal</a>
-      </nav>
-      <a class="button button-primary hide-mobile" href="quote.html">Get a Quote</a>
-      <button class="menu-toggle" type="button" aria-label="Open menu">☰</button>
-    </header>
+<div class="site-shell inner-page">
 
-    <nav class="mobile-nav container">
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="portfolio.html">Portfolio</a>
-      <a href="quote.html">Get a Quote</a>
-      <a href="contact.html">Contact</a>
-      <a href="client/login.html">Client Portal</a>
-    </nav>
+<header class="topbar container">
+<a class="brand" href="index.html"><span class="brand-mark">☕</span><span class="brand-text"><strong>BOOKS AND</strong><em>BREWS</em></span></a>
+<nav class="desktop-nav">
+<a href="index.html">Home</a>
+<a href="services.html">Services</a>
+<a href="portfolio.html">Portfolio</a>
+<a href="contact.html">Contact</a>
+</nav>
+<a class="button button-primary" href="quote.html">Get a Quote</a>
+</header>
 
-    <main class="container page-main">
-      <section class="hero quote-hero">
-        <div class="hero-card quote-hero-card">
-          <p class="section-kicker">QUOTE REQUEST</p>
-          <h1>Start My Website Now</h1>
-          <p class="hero-copy">Every project is custom. Submit your details, choose a package, and secure your spot with a deposit when you’re ready.</p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#quoteForm">Start Quote</a>
-            <a class="button button-secondary" href="services.html">View Pricing</a>
-          </div>
-        </div>
-      </section>
+<main class="container page-main">
 
-      <section class="section quote-section">
-        <div class="quote-layout">
-          <div class="section-card quote-form-card">
-            <form action="/api/contact" method="POST" class="form-grid" id="quoteForm" novalidate>
-              <input type="hidden" name="formType" value="quote">
-              <div>
-                <label for="quote-name">Name</label>
-                <input id="quote-name" name="name" autocomplete="name" required>
-                <small class="field-error"></small>
-              </div>
-              <div>
-                <label for="quote-email">Email</label>
-                <input id="quote-email" name="email" type="email" autocomplete="email" required>
-                <small class="field-error"></small>
-              </div>
-              <div>
-                <label for="quote-phone">Phone</label>
-                <input id="quote-phone" name="phone" type="tel" autocomplete="tel">
-                <small class="field-error"></small>
-              </div>
-              <div>
-                <label for="quote-business">Business name</label>
-                <input id="quote-business" name="businessName" autocomplete="organization">
-                <small class="field-error"></small>
-              </div>
-              <div>
-                <label for="quote-project">Project type</label>
-                <select id="quote-project" name="projectType" required>
-                  <option value="Starter Website" data-package="starter">Starter Website</option>
-                  <option value="Business Website" data-package="business">Business Website</option>
-                  <option value="Premium Website" data-package="premium">Premium Website</option>
-                  <option value="Redesign" data-package="custom">Redesign</option>
-                  <option value="Custom" data-package="custom">Custom</option>
-                </select>
-                <small class="field-error"></small>
-              </div>
-              <div>
-                <label for="quote-budget">Budget range</label>
-                <select id="quote-budget" name="budgetRange" required>
-                  <option value="$125 Starter" data-package="starter">$125 Starter</option>
-                  <option value="$300 Business" data-package="business">$300 Business</option>
-                  <option value="$600 Premium" data-package="premium">$600 Premium</option>
-                  <option value="Not sure yet" data-package="custom">Not sure yet</option>
-                </select>
-                <small class="field-error"></small>
-              </div>
-              <div class="full">
-                <label for="quote-details">Project details</label>
-                <textarea id="quote-details" name="projectDetails" placeholder="Tell us what kind of business you have, what pages you need, and what you want the website to help with." required minlength="20"></textarea>
-                <small class="field-error"></small>
-              </div>
-              <div class="full quote-actions-row">
-                <button class="btn primary" type="submit">Submit Quote Request</button>
-                <a class="btn secondary stripe-deposit-btn is-disabled" id="stripeDepositBtn" href="#" target="_blank" rel="noopener" aria-disabled="true">Pay Deposit</a>
-              </div>
-              <p class="form-response full" aria-live="polite"></p>
-            </form>
-          </div>
+<section class="page-hero">
+<p class="section-kicker">START YOUR PROJECT</p>
+<h1>Get Your Website Started</h1>
+<p>Tell us about your business and what you need. We’ll review your request and get back to you quickly with next steps.</p>
+</section>
 
-          <aside class="section-card quote-deposit-card">
-            <p class="section-kicker">SECURE YOUR SPOT</p>
-            <h2>Deposit due to start</h2>
-            <p class="deposit-copy">Choose a package and the deposit button updates automatically. Submit the quote first, then use the Stripe deposit button once you’re ready.</p>
-            <div class="deposit-box">
-              <span>Selected package</span>
-              <strong id="selectedPackage">Starter Website</strong>
-            </div>
-            <div class="deposit-box">
-              <span>Deposit</span>
-              <strong id="selectedDeposit">$60</strong>
-            </div>
-            <p class="stripe-note" id="stripeNote">Stripe link not connected yet. Add your Stripe Payment Link URLs in <code>script.js</code>.</p>
-            <ul class="quote-checklist">
-              <li>No full payment upfront</li>
-              <li>Balance due after approval</li>
-              <li>Most sites launch in 1–3 weeks</li>
-            </ul>
-          </aside>
-        </div>
-      </section>
-    </main>
-  </div>
-  <script src="script.js"></script>
+<section class="section">
+<div class="card" style="padding:28px; max-width:700px; margin:0 auto;">
+<p class="section-kicker">WHAT HAPPENS NEXT</p>
+<ul class="intro-bullets">
+<li>You submit your request</li>
+<li>We review and respond within 24 hours</li>
+<li>We plan your site</li>
+<li>We start once you approve</li>
+</ul>
+</div>
+</section>
+
+<section class="section">
+<div class="card" style="padding:30px; max-width:700px; margin:0 auto;">
+<form action="/api/contact" method="POST" class="form-grid">
+
+<label>Name</label>
+<input name="name" required>
+
+<label>Email</label>
+<input name="email" type="email" required>
+
+<label>Phone (optional)</label>
+<input name="phone">
+
+<label>Business Name</label>
+<input name="businessName">
+
+<label>What type of website do you need?</label>
+<select name="projectType" required>
+<option>Starter Website</option>
+<option>Business Website</option>
+<option>Premium Website</option>
+<option>Not sure</option>
+</select>
+
+<label>Budget Range</label>
+<select name="budgetRange" required>
+<option>$125 Starter</option>
+<option>$300 Business</option>
+<option>$600 Premium</option>
+<option>Not sure yet</option>
+</select>
+
+<label>Tell us about your project</label>
+<textarea name="projectDetails" placeholder="What does your business do? What do you want your website to help with?" required></textarea>
+
+<button class="button button-primary" type="submit" style="margin-top:18px;">Submit Request</button>
+
+</form>
+</div>
+</section>
+
+<section class="cta-band">
+<div>
+<h2>Ready to get started?</h2>
+<p>Most projects start within a few days. Limited spots available.</p>
+</div>
+<div class="cta-actions">
+<a class="button button-primary" href="#">Submit Your Request</a>
+</div>
+</section>
+
+</main>
+
+</div>
 </body>
 </html>
