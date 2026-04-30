@@ -1,3 +1,17 @@
+// Google Analytics
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+(function(){
+  if (!document.querySelector('script[src*="googletagmanager.com/gtag/js?id=G-SJQQ8SQ34Y"]')) {
+    const ga = document.createElement('script');
+    ga.async = true;
+    ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-SJQQ8SQ34Y';
+    document.head.appendChild(ga);
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-SJQQ8SQ34Y');
+})();
+
 document.querySelectorAll('.menu-toggle').forEach(btn=>btn.addEventListener('click',()=>{const nav=document.querySelector('.mobile-nav'); if(nav) nav.classList.toggle('open')}));
 
 document.querySelectorAll('form[action="/api/contact"]').forEach(form=>{form.addEventListener('submit',async e=>{e.preventDefault();const msg=form.querySelector('.form-response')||form.querySelector('.form-status'); if(msg) msg.textContent='Sending...'; try{const res=await fetch('/api/contact',{method:'POST',body:new FormData(form)});const data=await res.json().catch(()=>({})); if(!res.ok||data.ok===false) throw new Error(data.error||'Unable to send.'); if(msg) msg.textContent=data.message||'Thanks. Your message was received.'; form.reset();}catch(err){if(msg) msg.textContent=err.message||'Unable to send right now.'}})});
