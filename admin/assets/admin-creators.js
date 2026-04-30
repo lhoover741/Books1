@@ -20,6 +20,41 @@ async function loadCreators(){
  `).join('');
 }
 
+async function loadMatches(){
+ const res=await fetch('/api/leads');
+ const data=await res.json();
+
+ const leads=(data.leads||[]).filter(l=>l.form_type!=='creator_application');
+ const creators=(data.leads||[]).filter(l=>l.form_type==='creator_application' && l.status==='Approved');
+
+ const matches=[];
+
+ leads.forEach(lead=>{
+   creators.forEach(c=>{
+     if((lead.project_type||'').toLowerCase().includes((c.project_type||'').toLowerCase())){
+       matches.push({lead,c});
+     }
+   });
+ });
+
+ matchRows.innerHTML=matches.map(m=>`
+  <div class="match-card">
+    <strong>${m.lead.name}</strong>
+    <span>→ ${m.c.name}</span>
+    <button onclick="sendMatch(${m.lead.id},${m.c.id})">Send Lead</button>
+  </div>
+ `).join('');
+}
+
+async function sendMatch(leadId,creatorId){
+ await fetch(`/api/leads/${leadId}/note`,{
+   method:'POST',
+   headers:{'content-type':'application/json'},
+   body:JSON.stringify({note:`Matched with creator ID ${creatorId}`})
+ });
+ alert('Lead sent to creator');
+}
+
 async function updateStatus(id,status){
  await fetch(`/api/leads/${id}`,{
   method:'PATCH',
@@ -53,4 +88,5 @@ async function loadFeed(){
 if(location.pathname.includes('creators')){
  loadCreators();
  loadFeed();
+ loadMatches();
 }
