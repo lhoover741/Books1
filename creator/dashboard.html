@@ -1,1 +1,80 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Creator Dashboard</title><link rel="stylesheet" href="/creator/creator.css"></head><body><div class="creator-shell"><div class="creator-top"><div class="brand"><div class="mark">B&B</div><div><strong>Creator Portal</strong><span>Books and Brews</span></div></div><div class="nav"><a class="btn" href="/">Home</a><button class="btn" onclick="logout()">Logout</button></div></div><section class="hero"><p class="kicker">Creator Dashboard</p><h1 id="name">Loading...</h1><p id="status" class="pill">Status: Pending</p></section><div class="stats"><div class="stat"><span>Profile</span><strong id="profileScore">0%</strong></div><div class="stat"><span>Status</span><strong id="statusShort">Pending</strong></div><div class="stat"><span>Submissions</span><strong id="submissionCount">0</strong></div></div><div class="grid"><div><div class="card"><h3>Creator Onboarding</h3><div id="onboarding" class="steps"></div></div><div class="card"><h3>Profile Builder</h3><div class="form"><label>Creator Name / Brand</label><input id="creatorBrand" placeholder="Example: Braids by Maya"><label>Niche</label><select id="creatorNiche"><option>Beauty</option><option>Fitness</option><option>Food</option><option>Fashion</option><option>Local Business</option><option>Other</option></select><label>Bio</label><textarea id="creatorBio" placeholder="Tell us what you create and who you serve..."></textarea><label>Instagram / TikTok / Portfolio Link</label><input id="creatorPortfolio" placeholder="https://..."><button class="btn primary" onclick="saveProfile()">Save Profile</button><p id="profileMsg"></p></div></div><div class="card"><h3>Submit Content</h3><div class="form"><input id="contentLink" placeholder="Portfolio / post link"><textarea id="contentNotes" placeholder="Describe your content"></textarea><button class="btn primary" onclick="submitContent()">Submit Content</button><p id="submitMsg"></p></div></div></div><div><div class="card"><h3>Application Progress</h3><div id="approvalBox" class="list"></div></div><div class="card"><h3>Creator Chat</h3><div id="messages" class="chat-feed"></div><div class="form"><textarea id="creatorMessage" placeholder="Message Books and Brews..."></textarea><button class="btn primary" onclick="sendCreatorMessage()">Send Message</button><p id="chatMsg"></p></div></div></div></div></div><script src="/creator/creator.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Creator Dashboard | Books and Brews</title>
+<link rel="stylesheet" href="/creator/creator.css">
+</head>
+<body>
+<div class="creator-shell">
+  <div class="creator-top">
+    <div class="brand"><div class="mark">B&B</div><div><strong>Creator Portal</strong><span>Books and Brews Creator Network</span></div></div>
+    <div class="nav"><a class="btn" href="/">Home</a><button class="btn" onclick="logout()">Logout</button></div>
+  </div>
+
+  <section class="hero creator-hero">
+    <div>
+      <p class="kicker">Creator Dashboard</p>
+      <h1 id="name">Loading...</h1>
+      <p class="muted">Build your creator profile, submit content, track your approval, and message Books and Brews from one place.</p>
+      <div class="hero-actions"><span id="status" class="pill">Status: Pending</span><span id="nextAction" class="pill soft-pill">Next: Complete profile</span></div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><span>Profile Completion</span><strong id="profileScore">0%</strong><div class="mini-track"><div id="profileBar"></div></div></div>
+    <div class="stat"><span>Application Status</span><strong id="statusShort">Pending</strong></div>
+    <div class="stat"><span>Submissions</span><strong id="submissionCount">0</strong></div>
+  </div>
+
+  <div class="grid">
+    <main>
+      <div class="card highlight-card">
+        <h3>Creator Onboarding</h3>
+        <p class="muted">Follow these steps to complete your profile and move through review.</p>
+        <div id="onboarding" class="steps pro-steps"></div>
+      </div>
+
+      <div class="card">
+        <h3>Profile Builder</h3>
+        <p class="muted">This helps us understand your niche, style, audience, and where you may fit.</p>
+        <div class="form two-col-form">
+          <div><label>Creator Name / Brand</label><input id="creatorBrand" placeholder="Example: Braids by Maya"></div>
+          <div><label>Niche</label><select id="creatorNiche"><option>Beauty</option><option>Fitness</option><option>Food</option><option>Fashion</option><option>Local Business</option><option>Other</option></select></div>
+          <div class="full"><label>Bio</label><textarea id="creatorBio" placeholder="Tell us what you create, who you serve, and what makes your content stand out..."></textarea></div>
+          <div class="full"><label>Instagram / TikTok / Portfolio Link</label><input id="creatorPortfolio" placeholder="https://..."></div>
+          <button class="btn primary" onclick="saveProfile()">Save Profile</button><p id="profileMsg"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Submit Content</h3>
+        <p class="muted">Share examples of your work, social posts, short-form videos, or portfolio links.</p>
+        <div class="form">
+          <input id="contentLink" placeholder="Portfolio / post link">
+          <textarea id="contentNotes" placeholder="Describe what this content is and why it represents your work"></textarea>
+          <button class="btn primary" onclick="submitContent()">Submit Content</button><p id="submitMsg"></p>
+        </div>
+      </div>
+    </main>
+
+    <aside>
+      <div class="card">
+        <h3>Application Progress</h3>
+        <div id="approvalBox" class="list"></div>
+      </div>
+      <div class="card">
+        <h3>Creator Chat</h3>
+        <div id="messages" class="chat-feed"></div>
+        <div class="form chat-composer">
+          <textarea id="creatorMessage" placeholder="Message Books and Brews..."></textarea>
+          <button class="btn primary" onclick="sendCreatorMessage()">Send Message</button><p id="chatMsg"></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script src="/creator/creator.js"></script>
+</body>
+</html>
