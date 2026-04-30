@@ -4,24 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Client Login | Books and Brews</title>
-<link rel="stylesheet" href="/assets/css/styles.css">
 <link rel="stylesheet" href="/client/portal.css">
 </head>
 <body class="portal-body">
-<main class="portal-login-card">
-<p class="portal-kicker">Client Portal</p>
-<h1>Secure Client Login</h1>
-<p>Use the email and access code sent by Books and Brews to view your project dashboard.</p>
-<form id="clientLoginForm">
-<label>Email</label>
-<input id="clientEmail" type="email" required>
-<label>Access Code</label>
-<input id="clientCode" type="text" required>
-<button type="submit">Log In</button>
-<p id="clientLoginMsg"></p>
-</form>
-<a href="/">Back Home</a>
-</main>
+<div class="portal-login-wrap">
+  <div class="portal-login-grid">
+    <div class="portal-panel">
+      <div>
+        <p class="portal-kicker">Books and Brews</p>
+        <h1>Your project, in one place.</h1>
+        <p>Track your website, view invoices, access files, and stay updated without needing to ask for updates.</p>
+      </div>
+      <div class="portal-proof">
+        <div>✔ Real-time project updates</div>
+        <div>✔ Secure access to your files</div>
+        <div>✔ Simple payment + invoice tracking</div>
+      </div>
+    </div>
+    <div class="portal-login-card">
+      <p class="portal-kicker">Client Portal</p>
+      <h1>Login</h1>
+      <p class="portal-muted">Use the email and access code we sent you.</p>
+      <form id="clientLoginForm" class="portal-form">
+        <div>
+          <label>Email</label>
+          <input id="clientEmail" type="email" required>
+        </div>
+        <div>
+          <label>Access Code</label>
+          <input id="clientCode" type="text" required>
+        </div>
+        <button type="submit" class="portal-btn">Access Dashboard</button>
+        <p id="clientLoginMsg" class="portal-msg"></p>
+      </form>
+      <a href="/" class="portal-back">Back Home</a>
+    </div>
+  </div>
+</div>
 <script src="/client/portal.js"></script>
 </body>
 </html>
