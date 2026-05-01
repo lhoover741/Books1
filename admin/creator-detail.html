@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Creator Detail</title>
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<main style="padding:20px; max-width:900px; margin:auto;">
+<h1>Creator Profile</h1>
+<div id="creatorDetail"></div>
+
+<h3>Add Internal Note</h3>
+<textarea id="noteInput" style="width:100%;height:100px;"></textarea>
+<button onclick="addNote()">Save Note</button>
+
+<h3>Notes</h3>
+<div id="noteList"></div>
+</main>
+
+<script>
+const id = new URLSearchParams(location.search).get('id');
+
+async function load(){
+ const res = await fetch(`/api/leads/${id}`);
+ const data = await res.json();
+ const c = data.lead;
+
+ creatorDetail.innerHTML = `
+  <strong>${c.name}</strong><br>
+  ${c.email}<br>
+  ${c.creatorType || ''}<br>
+  ${c.message || ''}
+ `;
+
+ noteList.innerHTML = (data.notes||[]).map(n=>`<div>${n.note}</div>`).join('');
+}
+
+async function addNote(){
+ const note = noteInput.value;
+ await fetch('/api/notes-add',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({lead_id:id,note})});
+ noteInput.value='';
+ load();
+}
+
+load();
+</script>
+</body>
+</html>
