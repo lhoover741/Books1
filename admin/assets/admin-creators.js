@@ -104,6 +104,7 @@ function renderCreators() {
         ${portfolio ? `<a class="creator-link" href="${escapeHtml(portfolio)}" target="_blank" rel="noopener">Open portfolio</a>` : `<span class="creator-link muted-link">No portfolio link</span>`}
 
         <div class="creator-actions">
+          <button onclick="location.href='creator-detail.html?id=${c.id}'">View Profile</button>
           <button onclick="updateStatus(${c.id},'Approved')">Approve</button>
           <button onclick="updateStatus(${c.id},'Needs Work')">Needs Work</button>
           <button onclick="updateStatus(${c.id},'Rejected')">Reject</button>
@@ -116,79 +117,33 @@ function renderCreators() {
 function scoreMatch(lead, creator) {
   const leadText = normalize([lead.project_type, lead.message, lead.project_details, lead.business_name].filter(Boolean).join(' '));
   const creatorText = normalize([creator.creatorType, creator.project_type, creator.message, creator.project_details, creator.idealClients, creator.business_name].filter(Boolean).join(' '));
-
   const keywords = ['hair', 'hairstylist', 'barber', 'beauty', 'brand', 'website', 'landing', 'seo', 'ecommerce', 'shop', 'local', 'small business'];
   let score = 0;
-
-  keywords.forEach(word => {
-    if (leadText.includes(word) && creatorText.includes(word)) score += 2;
-  });
-
+  keywords.forEach(word => { if (leadText.includes(word) && creatorText.includes(word)) score += 2; });
   if (lead.project_type && creator.project_type && normalize(lead.project_type) === normalize(creator.project_type)) score += 5;
   if (lead.budget_range && normalize(lead.budget_range).includes('premium')) score += 1;
-
   return score;
 }
 
 function renderMatches() {
   const creators = creatorState.creators.filter(c => c.status === 'Approved');
   const matches = [];
-
-  creatorState.leads.forEach(lead => {
-    creators.forEach(c => {
-      const score = scoreMatch(lead, c);
-      if (score > 0) matches.push({ lead, c, score });
-    });
-  });
-
+  creatorState.leads.forEach(lead => creators.forEach(c => { const score = scoreMatch(lead, c); if (score > 0) matches.push({ lead, c, score }); }));
   matches.sort((a, b) => b.score - a.score);
-
-  if (!matches.length) {
-    matchRows.innerHTML = `
-      <div class="empty-state">
-        <strong>No suggested matches yet</strong>
-        <p>Approved creators and client leads will appear here when their details line up.</p>
-      </div>
-    `;
-    return;
-  }
-
+  if (!matches.length) { matchRows.innerHTML = `<div class="empty-state"><strong>No suggested matches yet</strong><p>Approved creators and client leads will appear here when their details line up.</p></div>`; return; }
   matchRows.innerHTML = matches.slice(0, 12).map(m => `
     <div class="match-card">
-      <div>
-        <strong>${escapeHtml(m.lead.name || 'Client Lead')}</strong>
-        <span>${escapeHtml(m.lead.project_type || 'Website project')}</span>
-      </div>
+      <div><strong>${escapeHtml(m.lead.name || 'Client Lead')}</strong><span>${escapeHtml(m.lead.project_type || 'Website project')}</span></div>
       <div class="match-arrow">→</div>
-      <div>
-        <strong>${escapeHtml(m.c.name || 'Creator')}</strong>
-        <span>Match score: ${m.score}</span>
-      </div>
+      <div><strong>${escapeHtml(m.c.name || 'Creator')}</strong><span>Match score: ${m.score}</span></div>
       <button onclick="sendMatch(${m.lead.id},${m.c.id})">Log Match</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function renderFeed() {
   const items = creatorState.feed;
-
-  if (!items.length) {
-    creatorFeed.innerHTML = `
-      <div class="empty-state">
-        <strong>No creator submissions yet</strong>
-        <p>Creator application details and submitted notes will appear here.</p>
-      </div>
-    `;
-    return;
-  }
-
-  creatorFeed.innerHTML = items.map(i => `
-    <div class="feed-item">
-      <strong>${escapeHtml(i.name || 'Creator')}</strong>
-      <span>${escapeHtml(i.email || '')}</span>
-      <p>${escapeHtml(i.message || i.project_details || 'No notes provided.')}</p>
-    </div>
-  `).join('');
+  if (!items.length) { creatorFeed.innerHTML = `<div class="empty-state"><strong>No creator submissions yet</strong><p>Creator application details and submitted notes will appear here.</p></div>`; return; }
+  creatorFeed.innerHTML = items.map(i => `<div class="feed-item"><strong>${escapeHtml(i.name || 'Creator')}</strong><span>${escapeHtml(i.email || '')}</span><p>${escapeHtml(i.message || i.project_details || 'No notes provided.')}</p></div>`).join('');
 }
 
 async function loadCreators() {
@@ -204,44 +159,9 @@ async function loadCreators() {
   }
 }
 
-async function loadMatches() {
-  if (!creatorState.creators.length && !creatorState.leads.length) await fetchLeadData();
-  renderMatches();
-}
-
-async function sendMatch(leadId, creatorId) {
-  await fetch(`/api/leads/${leadId}/note`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ note: `Matched with creator ID ${creatorId}` }),
-  });
-  alert('Match logged on lead notes');
-}
-
-async function updateStatus(id, status) {
-  await fetch(`/api/leads/${id}`, {
-    method: 'PATCH',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-  await loadCreators();
-}
-
-async function loadFeed() {
-  if (!creatorState.creators.length) await fetchLeadData();
-  renderFeed();
-}
-
-function wireCreatorControls() {
-  creatorSearch?.addEventListener('input', renderCreators);
-  creatorStatus?.addEventListener('change', renderCreators);
-  refreshCreators?.addEventListener('click', loadCreators);
-  refreshCreatorList?.addEventListener('click', loadCreators);
-  refreshMatches?.addEventListener('click', loadMatches);
-  refreshFeed?.addEventListener('click', loadFeed);
-}
-
-if (location.pathname.includes('creators')) {
-  wireCreatorControls();
-  loadCreators();
-}
+async function loadMatches() { if (!creatorState.creators.length && !creatorState.leads.length) await fetchLeadData(); renderMatches(); }
+async function sendMatch(leadId, creatorId) { await fetch(`/api/notes-add`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lead_id: leadId, note: `Matched with creator ID ${creatorId}` }) }); alert('Match logged on lead notes'); }
+async function updateStatus(id, status) { await fetch(`/api/leads/${id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status }) }); await loadCreators(); }
+async function loadFeed() { if (!creatorState.creators.length) await fetchLeadData(); renderFeed(); }
+function wireCreatorControls() { creatorSearch?.addEventListener('input', renderCreators); creatorStatus?.addEventListener('change', renderCreators); refreshCreators?.addEventListener('click', loadCreators); refreshCreatorList?.addEventListener('click', loadCreators); refreshMatches?.addEventListener('click', loadMatches); refreshFeed?.addEventListener('click', loadFeed); }
+if (location.pathname.includes('creators')) { wireCreatorControls(); loadCreators(); }
