@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Creator Login</title>
 <style>
-body{background:#000;color:#fff;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.card{background:#111;padding:30px;border-radius:16px;width:340px;border:1px solid #333}input{width:100%;padding:14px;margin-top:10px;border-radius:10px;border:1px solid #444;background:#0b0b0b;color:#fff;font-size:14px;box-sizing:border-box}button{width:100%;padding:14px;margin-top:18px;background:#d3a16a;border:none;border-radius:10px;font-weight:bold;cursor:pointer}#msg{margin-top:12px;color:#aaa;font-size:13px}
+body{background:#000;color:#fff;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.card{background:#111;padding:30px;border-radius:16px;width:340px;border:1px solid #333}input{width:100%;padding:14px;margin-top:10px;border-radius:10px;border:1px solid #444;background:#0b0b0b;color:#fff;font-size:14px;box-sizing:border-box}button{width:100%;padding:14px;margin-top:18px;background:#d3a16a;border:none;border-radius:10px;font-weight:bold;cursor:pointer}#msg{margin-top:12px;color:#aaa;font-size:13px}.link{margin-top:10px;display:block;text-align:center;color:#aaa;cursor:pointer}
 </style>
 </head>
 <body>
@@ -14,6 +14,7 @@ body{background:#000;color:#fff;font-family:Arial;display:flex;align-items:cente
   <input id="email" placeholder="Email">
   <input id="code" placeholder="Access Code">
   <button onclick="login()">Login</button>
+  <span class="link" onclick="resetCode()">Resend / Reset Code</span>
   <p id="msg"></p>
 </div>
 <script>
@@ -25,12 +26,23 @@ async function login(){
   msg.textContent='Checking...';
   const res=await fetch('/api/creator/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,code})});
   const data=await res.json();
-  if(!res.ok||!data.ok){msg.textContent='Invalid login';return}
+  if(!res.ok||!data.ok){msg.textContent=data.error||'Invalid login';return}
   localStorage.setItem('bb_creator_email',email);
   localStorage.setItem('bb_creator_token',data.token);
   localStorage.setItem('bb_creator_lead',data.lead_id);
   msg.textContent='Success… redirecting';
   setTimeout(()=>{location.href='/creator/dashboard.html'},500);
+}
+
+async function resetCode(){
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const msg=document.getElementById('msg');
+  if(!email){msg.textContent='Enter your email first';return}
+  msg.textContent='Sending new code...';
+  const res=await fetch('/api/creator/reset-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
+  const data=await res.json();
+  if(!res.ok||!data.ok){msg.textContent=data.error||'Error';return}
+  msg.textContent='New code sent to your email';
 }
 </script>
 </body>
