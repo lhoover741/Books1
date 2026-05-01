@@ -20,11 +20,8 @@ export async function onRequestPost({ request, env }) {
   const data = await body(request);
   const email = String(data.email || '').trim().toLowerCase();
   const code = String(data.code || '').trim();
-  const expectedCode = String(env.CREATOR_ACCESS_CODE || '').trim();
 
   if (!email || !code) return json({ ok:false, error:'Email and access code are required.' }, 400);
-  if (!expectedCode) return json({ ok:false, error:'Creator access code is not configured.' }, 500);
-  if (code !== expectedCode) return json({ ok:false, error:'Invalid access code.' }, 401);
 
   const creator = await db.prepare(
     'SELECT * FROM leads WHERE lower(email) = ? AND form_type = ? ORDER BY id DESC LIMIT 1'
@@ -32,6 +29,17 @@ export async function onRequestPost({ request, env }) {
 
   if (!creator) return json({ ok:false, error:'Creator application not found.' }, 404);
   if (creator.status !== 'Approved') return json({ ok:false, error:'Creator account is not approved yet.' }, 403);
+
+  const notes = await db.prepare(
+    'SELECT note FROM lead_notes WHERE lead_id = ? ORDER BY created_at DESC'
+  ).bind(creator.id).all();
+
+  const codeNote = (notes.results || []).find(n => n.note.includes('Login code generated'));
+  if (!codeNote) return json({ ok:false, error:'No access code found. Contact admin.' }, 403);
+
+  const storedCode = codeNote.note.split(':').pop().trim();
+
+  if (code !== storedCode) return json({ ok:false, error:'Invalid access code.' }, 401);
 
   return json({
     ok:true,
