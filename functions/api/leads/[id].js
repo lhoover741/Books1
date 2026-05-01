@@ -11,6 +11,12 @@ async function resend(env, payload) {
   return { ok: res.ok, status: res.status };
 }
 
+function generateSixDigitCode() {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return String(array[0] % 1000000).padStart(6, '0');
+}
+
 export async function onRequestGet({ env, params }) {
   if (!env.LEADS_DB) return json({ ok:false, error:'Missing LEADS_DB binding.' }, 500);
   const lead = await env.LEADS_DB.prepare('SELECT * FROM leads WHERE id = ?').bind(params.id).first();
@@ -22,34 +28,31 @@ export async function onRequestPatch({ request, env, params }) {
   if (!env.LEADS_DB) return json({ ok:false, error:'Missing LEADS_DB binding.' }, 500);
   const data = await body(request);
   const status = data.status || 'New';
+  const now = new Date().toISOString();
 
   const lead = await env.LEADS_DB.prepare('SELECT * FROM leads WHERE id = ?').bind(params.id).first();
 
   await env.LEADS_DB.prepare('UPDATE leads SET status = ?, updated_at = ? WHERE id = ?')
-    .bind(status, new Date().toISOString(), params.id).run();
+    .bind(status, now, params.id).run();
 
-  // Only trigger on approval
-  if (lead && lead.form_type === 'creator_application' && status === 'Approved') {
+  // Only trigger approval emails when a pending creator is approved for the first time.
+  if (lead && lead.form_type === 'creator_application' && status === 'Approved' && lead.status !== 'Approved') {
+    const code = generateSixDigitCode();
 
-    // Approval email
     await resend(env, {
       to: lead.email,
       subject: 'You’ve been approved - Books and Brews Creator Network',
-      html: `<h1>You're Approved</h1><p>Hi ${lead.name || ''},</p><p>Your creator application has been approved.</p><p>You now have access to the Books and Brews creator network.</p>`
+      html: `<h1>You're Approved</h1><p>Hi ${lead.name || ''},</p><p>Your creator application has been approved.</p><p>You now have access to the Books and Brews creator network.</p><p>Your access code will arrive in a separate email.</p>`
     });
-
-    // Access code email (separate)
-    const code = env.CREATOR_ACCESS_CODE || 'SET_ACCESS_CODE';
 
     await resend(env, {
       to: lead.email,
       subject: 'Your Creator Access Code',
-      html: `<h1>Access Code</h1><p>Use the following code to log in:</p><p><strong>${code}</strong></p><p>Go to the creator portal and enter your email + this code.</p>`
+      html: `<h1>Creator Access Code</h1><p>Use this 6-digit code to log in:</p><p style="font-size:28px;font-weight:bold;letter-spacing:4px;">${code}</p><p>Go to the creator portal and enter your email plus this code.</p><p>For security, do not share this code.</p>`
     });
 
-    // Log note
     await env.LEADS_DB.prepare('INSERT INTO lead_notes (lead_id, note, created_at) VALUES (?, ?, ?)')
-      .bind(params.id, 'Creator approved and access code sent.', new Date().toISOString())
+      .bind(params.id, `Creator approved. Login code generated: ${code}`, now)
       .run();
   }
 
