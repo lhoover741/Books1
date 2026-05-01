@@ -13,6 +13,18 @@ function makeToken(email, id) {
   return btoa(`${email}:${id}:${Date.now()}`);
 }
 
+function parseCodeFromNote(note = '') {
+  const match = String(note).match(/Login code generated:\s*(\d{6})/i);
+  return match ? match[1] : '';
+}
+
+function isExpired(createdAt) {
+  const created = new Date(createdAt).getTime();
+  if (!created) return true;
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  return Date.now() - created > twentyFourHours;
+}
+
 export async function onRequestPost({ request, env }) {
   const db = env.LEADS_DB || env.DB;
   if (!db) return json({ ok:false, error:'Missing database binding.' }, 500);
@@ -31,15 +43,18 @@ export async function onRequestPost({ request, env }) {
   if (creator.status !== 'Approved') return json({ ok:false, error:'Creator account is not approved yet.' }, 403);
 
   const notes = await db.prepare(
-    'SELECT note FROM lead_notes WHERE lead_id = ? ORDER BY created_at DESC'
+    'SELECT note, created_at FROM lead_notes WHERE lead_id = ? ORDER BY created_at DESC'
   ).bind(creator.id).all();
 
-  const codeNote = (notes.results || []).find(n => n.note.includes('Login code generated'));
-  if (!codeNote) return json({ ok:false, error:'No access code found. Contact admin.' }, 403);
+  const codeNote = (notes.results || []).find(n => String(n.note || '').includes('Login code generated'));
+  if (!codeNote) return json({ ok:false, error:'No access code found. Request a new code.' }, 403);
 
-  const storedCode = codeNote.note.split(':').pop().trim();
+  if (isExpired(codeNote.created_at)) {
+    return json({ ok:false, error:'Access code expired. Request a new code.' }, 403);
+  }
 
-  if (code !== storedCode) return json({ ok:false, error:'Invalid access code.' }, 401);
+  const storedCode = parseCodeFromNote(codeNote.note);
+  if (!storedCode || code !== storedCode) return json({ ok:false, error:'Invalid access code.' }, 401);
 
   return json({
     ok:true,
