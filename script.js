@@ -33,6 +33,7 @@ document.querySelectorAll('form[action="/api/contact"]').forEach(form => {
       form.appendChild(msg);
     }
     msg.textContent = 'Sending...';
+    msg.style.color = 'var(--accent)';
 
     try {
       const res = await fetch('/api/contact', { method: 'POST', body: new FormData(form) });
@@ -73,7 +74,10 @@ document.querySelectorAll('form[action="/api/contact"]').forEach(form => {
   const shell = document.querySelector('.site-shell');
   if (!shell) return;
 
-  let footer = document.querySelector('.footer');
+  const existingFooters = Array.from(document.querySelectorAll('footer.footer, .footer.container'));
+  let footer = existingFooters[0];
+  existingFooters.slice(1).forEach(el => el.remove());
+
   if (!footer) {
     footer = document.createElement('footer');
     shell.appendChild(footer);
