@@ -136,7 +136,7 @@ function renderMatches() {
       <div><strong>${escapeHtml(m.lead.name || 'Client Lead')}</strong><span>${escapeHtml(m.lead.project_type || 'Website project')}</span></div>
       <div class="match-arrow">→</div>
       <div><strong>${escapeHtml(m.c.name || 'Creator')}</strong><span>Match score: ${m.score}</span></div>
-      <button onclick="sendMatch(${m.lead.id},${m.c.id})">Send / Log Lead</button>
+      <button onclick="sendMatch(${m.lead.id},${m.c.id})">Send Lead Email</button>
     </div>`).join('');
 }
 
@@ -162,24 +162,23 @@ async function loadCreators() {
 async function loadMatches() { if (!creatorState.creators.length && !creatorState.leads.length) await fetchLeadData(); renderMatches(); }
 
 async function sendMatch(leadId, creatorId) {
-  const lead = creatorState.leads.find(l => Number(l.id) === Number(leadId));
-  const creator = creatorState.creators.find(c => Number(c.id) === Number(creatorId));
-  const leadLabel = lead ? `${lead.name || 'Client'} (${lead.project_type || 'Project'})` : `Lead ${leadId}`;
-  const creatorLabel = creator ? `${creator.name || 'Creator'} (${creator.email || 'no email'})` : `Creator ${creatorId}`;
-
-  await fetch('/api/notes-add', {
+  const res = await fetch('/api/contact', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ lead_id: leadId, note: `Sent/logged lead assignment to ${creatorLabel}.` })
+    body: JSON.stringify({
+      action: 'creator_notification',
+      lead_id: leadId,
+      creator_id: creatorId
+    })
   });
 
-  await fetch('/api/notes-add', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ lead_id: creatorId, note: `Received/logged lead opportunity: ${leadLabel}.` })
-  });
+  const data = await res.json().catch(() => ({}));
 
-  alert('Lead assignment logged on both the client lead and creator profile.');
+  if (res.ok && data.ok) {
+    alert('Lead email sent to creator and activity logged.');
+  } else {
+    alert(data.error || 'Something went wrong sending the creator notification.');
+  }
 }
 
 async function updateStatus(id, status) { await fetch(`/api/leads/${id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status }) }); await loadCreators(); }
