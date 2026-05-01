@@ -46,6 +46,7 @@
 <section class="section">
 <div class="card" style="padding:30px; max-width:700px; margin:0 auto;">
 <form action="/api/contact" method="POST" class="form-grid">
+<input type="hidden" name="formType" value="quote_request">
 
 <label>Name</label>
 <input name="name" required>
@@ -88,6 +89,7 @@ I agree to the <a href="/client-agreement.html" style="color:#C89B6D;">Client Ag
 </div>
 
 <button class="button button-primary" type="submit" style="margin-top:18px;">Submit Request</button>
+<p class="form-response" aria-live="polite" style="margin-top:16px;color:var(--accent);font-weight:800;"></p>
 
 </form>
 </div>
