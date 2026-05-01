@@ -1,12 +1,23 @@
 const lead=new URLSearchParams(location.search).get('lead')||localStorage.getItem('bb_lead');
 const token=localStorage.getItem('bb_token');
+
+async function validateSession(){
+ try{
+  const res=await fetch('/api/client/session',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:localStorage.getItem('bb_email'),token,lead_id:lead})});
+  const data=await res.json();
+  if(!res.ok||!data.ok){logout();}
+ }catch{logout();}
+}
+
+validateSession();
+
 const unreadKey='bb_seen_messages_'+lead;
 let initialLoad=true;
 let isSending=false;
 function esc(v){return String(v??'').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
 function money(v){return '$'+Number(v||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
 function safeDate(v){try{return v?new Date(v).toLocaleString():''}catch(e){return ''}}
-function logout(){localStorage.removeItem('bb_lead');localStorage.removeItem('bb_token');location.href='/client/login.html'}
+function logout(){localStorage.removeItem('bb_lead');localStorage.removeItem('bb_token');localStorage.removeItem('bb_email');location.href='/client/login.html'}
 function authHeaders(extra={}){return Object.assign({'x-portal-token':token||''},extra)}
 function getSeenCount(){return Number(localStorage.getItem(unreadKey)||0)}
 function setSeenCount(n){localStorage.setItem(unreadKey,String(n))}
