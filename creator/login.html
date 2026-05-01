@@ -39,7 +39,7 @@ async function resetCode(){
   const msg=document.getElementById('msg');
   if(!email){msg.textContent='Enter your email first';return}
   msg.textContent='Sending new code...';
-  const res=await fetch('/api/creator/reset-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
+  const res=await fetch('/api/creator/reset',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
   const data=await res.json();
   if(!res.ok||!data.ok){msg.textContent=data.error||'Error';return}
   msg.textContent='New code sent to your email';
