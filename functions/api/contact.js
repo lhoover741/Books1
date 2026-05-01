@@ -42,9 +42,64 @@ async function sendEmail(env, lead) {
   return { ok: res.ok, status: res.status };
 }
 
+async function sendCreatorNotification(env, creator, lead) {
+  if (!env.RESEND_API_KEY || !env.LEAD_FROM_EMAIL) return { skipped: true };
+  if (!creator.email) return { skipped: true, error: 'Creator email missing' };
+
+  const subject = 'New lead opportunity from Books and Brews';
+  const html = `<h1>New Lead Opportunity</h1><p>Hi ${creator.name || 'there'},</p><p>A client opportunity may be a good fit for you.</p><p><strong>Client:</strong> ${lead.name || 'Not provided'}</p><p><strong>Business:</strong> ${lead.business_name || 'Not provided'}</p><p><strong>Project:</strong> ${lead.project_type || 'Not provided'}</p><p><strong>Budget:</strong> ${lead.budget_range || 'Not provided'}</p><p><strong>Details:</strong> ${lead.project_details || lead.message || 'No details provided'}</p><p>Reply to Books and Brews if you want to move forward with this opportunity.</p>`;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: env.LEAD_FROM_EMAIL,
+      to: creator.email,
+      subject,
+      html
+    })
+  });
+  return { ok: res.ok, status: res.status };
+}
+
+async function handleCreatorNotification(body, env) {
+  const db = env.DB || env.LEADS_DB;
+  if (!db) return json({ ok:false, error:'Missing database binding.' }, 500);
+
+  const leadId = Number(body.lead_id);
+  const creatorId = Number(body.creator_id);
+  if (!leadId || !creatorId) return json({ ok:false, error:'Lead ID and creator ID are required.' }, 400);
+
+  const lead = await db.prepare('SELECT * FROM leads WHERE id = ?').bind(leadId).first();
+  const creator = await db.prepare('SELECT * FROM leads WHERE id = ?').bind(creatorId).first();
+  if (!lead || !creator) return json({ ok:false, error:'Lead or creator not found.' }, 404);
+
+  const emailResult = await sendCreatorNotification(env, creator, lead).catch(e => ({ ok:false, error:String(e) }));
+  const now = new Date().toISOString();
+  const status = emailResult.ok ? 'sent' : (emailResult.skipped ? 'skipped' : 'failed');
+
+  await db.prepare('INSERT INTO lead_notes (lead_id, note, created_at) VALUES (?, ?, ?)')
+    .bind(leadId, `Creator notification ${status}: ${creator.name || creator.email || creatorId}.`, now)
+    .run();
+
+  await db.prepare('INSERT INTO lead_notes (lead_id, note, created_at) VALUES (?, ?, ?)')
+    .bind(creatorId, `Lead opportunity notification ${status}: ${lead.name || lead.email || leadId}.`, now)
+    .run();
+
+  return json({ ok:true, emailResult });
+}
+
 export async function onRequestPost({ request, env }) {
   try {
     const body = await parseBody(request);
+
+    if (body.action === 'creator_notification') {
+      return await handleCreatorNotification(body, env);
+    }
+
     const now = new Date().toISOString();
     const budget = clean(body.budgetRange || body.budget_range || body.budget);
     const lead = {
