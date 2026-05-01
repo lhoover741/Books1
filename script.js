@@ -12,7 +12,7 @@ function gtag(){dataLayer.push(arguments);}
   gtag('config', 'G-SJQQ8SQ34Y');
 })();
 
-// Inject favicon globally
+// Inject favicon + touch icon
 (function(){
   if(!document.querySelector("link[rel='icon']")){
     const link=document.createElement('link');
@@ -20,6 +20,13 @@ function gtag(){dataLayer.push(arguments);}
     link.type='image/svg+xml';
     link.href='/favicon.svg';
     document.head.appendChild(link);
+  }
+
+  if(!document.querySelector("link[rel='apple-touch-icon']")){
+    const touch=document.createElement('link');
+    touch.rel='apple-touch-icon';
+    touch.href='/apple-touch-icon.svg';
+    document.head.appendChild(touch);
   }
 })();
 
