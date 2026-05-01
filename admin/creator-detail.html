@@ -5,19 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Creator Detail</title>
 <link rel="stylesheet" href="assets/admin.css">
+<style>
+body{background:#0b0b0c;color:#f5ede3;font-family:Inter,system-ui;}
+.container{max-width:900px;margin:auto;padding:30px;}
+.card{background:#151515;border:1px solid #2a2a2a;padding:20px;border-radius:12px;margin-bottom:20px;}
+button{background:#6f4e37;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;}
+textarea{width:100%;background:#111;border:1px solid #333;color:#fff;border-radius:8px;padding:10px;}
+.note{border-bottom:1px solid #2a2a2a;padding:10px 0;}
+</style>
 </head>
 <body>
-<main style="padding:20px; max-width:900px; margin:auto;">
+<div class="container">
 <h1>Creator Profile</h1>
-<div id="creatorDetail"></div>
+<div id="creatorDetail" class="card"></div>
 
+<div class="card">
 <h3>Add Internal Note</h3>
-<textarea id="noteInput" style="width:100%;height:100px;"></textarea>
+<textarea id="noteInput"></textarea>
+<br><br>
 <button onclick="addNote()">Save Note</button>
+</div>
 
+<div class="card">
 <h3>Notes</h3>
 <div id="noteList"></div>
-</main>
+</div>
+</div>
 
 <script>
 const id = new URLSearchParams(location.search).get('id');
@@ -28,13 +41,13 @@ async function load(){
  const c = data.lead;
 
  creatorDetail.innerHTML = `
-  <strong>${c.name}</strong><br>
-  ${c.email}<br>
-  ${c.creatorType || ''}<br>
-  ${c.message || ''}
+  <h2>${c.name}</h2>
+  <p>${c.email}</p>
+  <p>${c.creatorType||''}</p>
+  <p>${c.message||''}</p>
  `;
 
- noteList.innerHTML = (data.notes||[]).map(n=>`<div>${n.note}</div>`).join('');
+ noteList.innerHTML = (data.notes||[]).map(n=>`<div class='note'>${n.note}</div>`).join('');
 }
 
 async function addNote(){
