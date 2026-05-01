@@ -21,6 +21,12 @@ function priorityFromBudget(budget) {
   return b.includes('800+') || b.includes('600') || b.includes('5000') || b.includes('5,000') ? 'High' : 'Normal';
 }
 
+function generateSixDigitCode() {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return String(array[0] % 1000000).padStart(6, '0');
+}
+
 async function resend(env, payload) {
   if (!env.RESEND_API_KEY || !env.LEAD_FROM_EMAIL) return { skipped: true };
   const res = await fetch('https://api.resend.com/emails', {
@@ -39,6 +45,21 @@ async function sendEmail(env, lead) {
   const subject = `New Books and Brews ${lead.form_type} - ${lead.name}`;
   const html = `<h1>New Books and Brews Lead</h1><p>Name: ${lead.name}</p><p>Email: ${lead.email}</p><p>Phone: ${lead.phone || 'Not provided'}</p><p>Business: ${lead.business_name || 'Not provided'}</p><p>Project: ${lead.project_type || 'Not provided'}</p><p>Budget: ${lead.budget_range || 'Not provided'}</p><p>${lead.project_details || lead.message || ''}</p>`;
   return resend(env, { to: env.LEAD_NOTIFY_TO, reply_to: lead.email, subject, html });
+}
+
+async function sendClientLoginCode(env, db, lead, leadId) {
+  if (!db || !leadId || !lead.email) return { skipped: true };
+  const code = generateSixDigitCode();
+  const now = new Date().toISOString();
+
+  await db.prepare('INSERT INTO lead_notes (lead_id, note, created_at) VALUES (?, ?, ?)')
+    .bind(leadId, `Client login code generated: ${code}`, now)
+    .run();
+
+  const subject = 'Your Books and Brews Client Portal Code';
+  const html = `<h1>Your Client Portal Code</h1><p>Hi ${lead.name || 'there'},</p><p>Thanks for submitting your website request. Your client portal has been prepared so you can track updates in one place.</p><p>Your 6-digit access code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:4px;">${code}</p><p>This code expires in 24 hours.</p><p>Login here: <a href="https://1.govdirect.tech/client/login.html">Client Portal</a></p>`;
+
+  return resend(env, { to: lead.email, subject, html });
 }
 
 async function sendCreatorApplicationReceived(env, lead) {
@@ -105,10 +126,15 @@ export async function onRequestPost({ request, env }) {
 
     const emailResult = await sendEmail(env, lead).catch(e => ({ ok:false, error:String(e) }));
     let applicantEmailResult = null;
+    let clientCodeEmailResult = null;
+
     if (lead.form_type === 'creator_application') {
       applicantEmailResult = await sendCreatorApplicationReceived(env, lead).catch(e => ({ ok:false, error:String(e) }));
+    } else if (id && db) {
+      clientCodeEmailResult = await sendClientLoginCode(env, db, lead, id).catch(e => ({ ok:false, error:String(e) }));
     }
-    return json({ ok:true, id, message:'Thanks. Your request was received.', dbSaved:Boolean(id), emailResult, applicantEmailResult });
+
+    return json({ ok:true, id, message:'Thanks. Your request was received. Your client portal code has been emailed to you.', dbSaved:Boolean(id), emailResult, applicantEmailResult, clientCodeEmailResult });
   } catch (error) {
     return json({ ok:false, error:String(error) }, 500);
   }
